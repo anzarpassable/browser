@@ -109,14 +109,10 @@ class Browser:
         self.draw()
 
     def scrollUp(self, e):
-        if self.scrolled - SCROLL_STEP >= -20: # -20 chosen instead of zero as it allows us to scroll to the top enough that theres some gap between the
-                                               # top character and the edge of the window
-            self.scrolled -= SCROLL_STEP
-            self.draw()
-        else:
-            return
+        self.scrolled = max(0, self.scrolled - SCROLL_STEP)
+        self.draw()
 
-    def scrollWheel(self, e):
+    def scrollWheel(self, e):        
         if self.scrolled - e.delta >= -20:
             self.scrolled -= e.delta
             self.draw()
@@ -124,10 +120,17 @@ class Browser:
             return
 
     def draw(self):
-        self.canvas.delete("all")
+        documentHeight = max(y for x, y, c, font in self.displayList)
+        maxScroll = max(0, documentHeight - (HEIGHT * 0.75))
+        if self.scrolled < maxScroll:
+            self.canvas.delete("all")
+        else:
+            self.scrolled = maxScroll
+            return
         for x, y, c, font in self.displayList:
             if  y > self.scrolled + HEIGHT: continue
             if y + VSTEP < self.scrolled: continue
+            self.scrolled = min(self.scrolled, maxScroll)
             self.canvas.create_text(x, y - self.scrolled, text = c, anchor = "nw", font = font)
 
     def load(self, url):
