@@ -18,10 +18,12 @@ HEAD_TAGS = ["base", "basefont", "bgsound", "noscript", "link", "meta", "title",
 class URL:
     def __init__(self, url):
 
-        # TODO: See if I can find a way to default to http/https so you dont need to type it all out when starting
-
+        if "://" not in url:
+            url = "http://" + url
         self.scheme, url = url.split("://", 1) # ex: "http://example.com/" would become ["http", "example.com/"], self.scheme takes [0], url takes [1]
                                                # second arg of .split() defines the maximum number of splits to make
+        if "www." not in url:
+            url = "www." + url
 
         assert self.scheme in ["http", "https"] # assert raises an error if the comparison evaluates to False
         if "/" not in url:
@@ -32,7 +34,7 @@ class URL:
         '''
         example url = "http://www.youtube.com/watch"
         self.scheme = http
-        self.host = youtube.com
+        self.host = www.youtube.com
         self.path = /watch
         '''
 
